@@ -393,6 +393,26 @@ function process_item_encoder(result, using_txt) {
                     write_buffer_string(mem_pos, result1[52].length, result1[52])
                     mem_pos += result1[52].length
                 }
+                // Dynamic version support from 23 to 65535
+                for (let v = 23; v <= Math.min(version, 65535); v++) {
+                    if (v % 2 === 0) {
+                        // Even versions: string fields
+                        let fieldIndex = 52 + (v - 22);
+                        if (result1[fieldIndex]) {
+                            write_buffer_number(mem_pos, 2, result1[fieldIndex].length);
+                            mem_pos += 2;
+                            write_buffer_string(mem_pos, result1[fieldIndex].length, result1[fieldIndex])
+                            mem_pos += result1[fieldIndex].length
+                        }
+                    } else {
+                        // Odd versions: integer fields
+                        let fieldIndex = 52 + (v - 22);
+                        if (result1[fieldIndex]) {
+                            write_buffer_number(mem_pos, 4, result1[fieldIndex])
+                            mem_pos += 4;
+                        }
+                    }
+                }
             }
         }
     } else {
